@@ -14,6 +14,7 @@ import {
   cilSpeedometer,
   cilStar,
   cilCommentBubble,
+  cilUser,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -502,6 +503,12 @@ const _nav = [
     name: '채팅',
     to: '/chat',
     icon: <CIcon icon={cilCommentBubble} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: '사용자목록',
+    to: '/userList',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

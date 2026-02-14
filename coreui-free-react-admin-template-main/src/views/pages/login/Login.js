@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useDebugValue, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   CButton,
@@ -35,19 +35,25 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-      })
+      });
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Login failed')
+      // 1. 성공했는지 먼저 확인
+      if (response.ok) {
+        // [성공 로직]
+        const data = await response.json();
+        localStorage.setItem('token', data.token);   // 토큰 저장
+        localStorage.setItem('username', username);  // 사용자 이름 저장
+        navigate('/');                               // 홈으로 이동
+      } else {
+        // [실패 로직] 401, 404, 500 에러 등
+        const errorData = await response.json();
+        throw new Error(errorData.message || '로그인에 실패했습니다.');
       }
 
-      const data = await response.json()
-      localStorage.setItem('token', data.token) // JWT 저장
-      navigate('/') // 로그인 성공 후 홈으로 이동
     } catch (err) {
-      setError(err.message)
-      setLoading(false)
+      // 위에서 throw한 에러나 네트워크 에러가 여기서 잡힙니다.
+      setError(err.message);
+      setLoading(false);
     }
   }
 

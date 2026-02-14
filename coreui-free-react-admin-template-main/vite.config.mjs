@@ -6,6 +6,9 @@ import autoprefixer from 'autoprefixer'
 export default defineConfig(() => {
   return {
     base: './',
+    define: {
+      global: 'window',
+    },
     build: {
       outDir: 'build',
     },
