@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # 1. 데이터베이스 (PostgreSQL 16버전)
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres        # 본인이 사용하던 계정 아이디
+      POSTGRES_PASSWORD: wogus1212! # 본인이 사용하던 비밀번호
+      POSTGRES_DB: portfolio_db            # 연결할 데이터베이스 이름
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data # DB 데이터를 내 컴퓨터에 저장
+
+  # 2. 백엔드 (스프링부트 - 자바 21)
+  backend:
+    build: ./backend
+    container_name: spring-backend
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      # 도커 환경에서 DB 접속 주소는 localhost 대신 서비스명인 'db'를 사용합니다.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/portfolio_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: wogus1212!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  # 3. 프런트엔드 (리액트)
+  frontend:
+    build: ./frontend
+    container_name: react-frontend
+    ports:
+      - "3000:3000"
+    command: npm start -- --host 0.0.0.0
+    stdin_open: true
+    tty: true

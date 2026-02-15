@@ -1,0 +1,44 @@
+### 1. 보안 파일 (절대 올리면 안 됨) ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+### 2. Java / Spring Boot 관련 ###
+target/
+build/
+.gradle/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+# IDE 설정 파일
+.settings/
+.classpath
+.project
+.metadata
+.idea/
+*.iml
+
+### 3. React / Node.js 관련 ###
+node_modules/
+dist/
+build/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### 4. Docker 관련 ###
+# DB 데이터가 저장되는 폴더 (용량이 크고 로컬 데이터이므로 제외)
+postgres_data/
+mysql_data/
+*.db
+
+### 5. OS 관련 ###
+.DS_Store
+Thumbs.db
