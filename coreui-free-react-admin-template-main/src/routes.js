@@ -51,7 +51,9 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
+// Chat
 const chat = React.lazy(() => import('./views/chat/Chat'))
+const ChatRoom = React.lazy(() => import('./views/chat/Chatroom'))
 
 const userList = React.lazy(() => import('./views/user/userList'))
 
@@ -102,6 +104,7 @@ const routes = [
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
   { path: '/chat', name: 'chat', element: chat },
+  { path: '/chatroom', name: 'ChatRoom', element: ChatRoom },
   { path: '/userList', name: 'userList', element: userList },
 ]
 

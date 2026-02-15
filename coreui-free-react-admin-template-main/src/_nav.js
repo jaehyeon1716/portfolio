@@ -501,7 +501,7 @@ const _nav = [
   {
     component: CNavItem,
     name: '채팅',
-    to: '/chat',
+    to: '/chatroom',
     icon: <CIcon icon={cilCommentBubble} customClassName="nav-icon" />,
   },
   {
