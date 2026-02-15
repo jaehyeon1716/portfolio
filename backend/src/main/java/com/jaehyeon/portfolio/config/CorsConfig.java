@@ -14,8 +14,11 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("*");
+                        //.allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://13.125.23.247:3000") // 프론트엔드 주소 허용
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("*")
+                        .allowCredentials(true);
             }
         };
     }
