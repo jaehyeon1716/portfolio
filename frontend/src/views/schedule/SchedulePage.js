@@ -35,7 +35,7 @@ const SchedulePage = () => {
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get(`${API_URL}`,{
+      const response = await axios.get(API_URL,{
         params:{ username : currentUsername}
       });
       setEvents(response.data);
