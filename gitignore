@@ -42,3 +42,5 @@ mysql_data/
 ### 5. OS 관련 ###
 .DS_Store
 Thumbs.db
+
+postgres_data/
