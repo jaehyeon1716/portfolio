@@ -15,6 +15,9 @@ spring:
       hibernate:
         format_sql: true
 
+upload:
+  path: ${UPLOAD_PATH:C:/chat_uploads/}
+
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace

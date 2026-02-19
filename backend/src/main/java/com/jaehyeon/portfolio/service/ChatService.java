@@ -6,6 +6,7 @@ import com.jaehyeon.portfolio.entity.ChatRoom;
 import com.jaehyeon.portfolio.repository.ChatMessageRepository;
 import com.jaehyeon.portfolio.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value; // 추가됨
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,9 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    // 실제 파일이 저장될 경로 (WebConfig 설정과 일치해야 함)
-    private final String uploadDir = "C:/chat_uploads/";
+    // application.yml의 upload.path 값을 가져오고, 없으면 기본값(C:/chat_uploads/) 사용
+    @Value("${upload.path:C:/chat_uploads/}")
+    private String uploadDir;
 
     @Transactional
     public ChatMessage saveMessageAndUpdateRoom(ChatRequestDTO request) {
@@ -58,11 +60,16 @@ public class ChatService {
     public ChatMessage uploadFile(MultipartFile file, String roomId, String senderId) throws IOException {
         // 1. 디렉토리 생성
         File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (!created) {
+                throw new IOException("디렉토리 생성 실패: " + uploadDir);
+            }
+        }
 
         // 2. 파일 저장
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        File dest = new File(uploadDir + fileName);
+        File dest = new File(uploadDir, fileName); // 경로와 파일명 결합 최적화
         file.transferTo(dest);
 
         // 3. 메시지 형식 생성 및 저장
