@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { CButton, CFormInput, CSpinner } from '@coreui/react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
+import { Paperclip, FileText, Download } from 'lucide-react'; // 아이콘 추가
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
@@ -17,9 +18,11 @@ const Chat = () => {
   const chatWith = queryParams.get('with'); 
 
   const scrollRef = useRef(null);
+  const fileInputRef = useRef(null); // 파일 인풋 참조
   const myName = useMemo(() => localStorage.getItem('username') || 'Guest', []);
   const apiUrl = `${import.meta.env.VITE_API_URL}`;
 
+  // 스크롤 하단 이동
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -29,15 +32,41 @@ const Chat = () => {
     }
   }, [messages]);
 
+  // 파일 업로드 처리
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !roomId) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('roomId', roomId);
+    formData.append('senderId', myName);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/chat/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) throw new Error('파일 업로드 실패');
+      
+      // 인풋 초기화
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      console.log("파일 업로드 완료");
+    } catch (err) {
+      console.error("파일 업로드 에러:", err);
+      alert("파일 업로드 중 오류가 발생했습니다.");
+    }
+  };
+
   useEffect(() => {
-    // [핵심 수정] 방이 변경되면 즉시 이전 메시지들을 화면에서 지웁니다.
     setMessages([]);
-    setConnected(false); // 연결 상태 초기화
+    setConnected(false);
 
     const fetchHistory = async () => {
       if (!roomId) return; 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/history?roomId=${roomId}`);
+        const response = await fetch(`${apiUrl}/api/chat/history?roomId=${roomId}`);
         if (!response.ok) throw new Error('히스토리 로드 실패');
         
         const data = await response.json();
@@ -48,8 +77,6 @@ const Chat = () => {
           senderName: m.senderId,
           time: m.timestamp
         }));
-        
-        // 가져온 데이터가 현재 보고 있는 roomId의 데이터인지 한 번 더 확인하면 좋습니다.
         setMessages(history);
       } catch (err) {
         console.error("내역 로드 실패:", err);
@@ -68,15 +95,11 @@ const Chat = () => {
     stompClient.onConnect = () => {
       setConnected(true);
       if (roomId) {
-        // 특정 방 전용 채널 구독
         stompClient.subscribe(`/sub/chat/${roomId}`, (message) => {
           const receivedMsg = JSON.parse(message.body);
-          
-          // 수신된 메시지의 roomId가 현재 활성화된 roomId와 다르면 무시
           if (receivedMsg.roomId !== roomId) return;
 
           const senderType = receivedMsg.senderId === myName ? 'me' : 'other';
-          
           const newMsg = { 
             id: receivedMsg.id || Date.now() + Math.random(), 
             text: receivedMsg.message, 
@@ -86,7 +109,6 @@ const Chat = () => {
           };
 
           setMessages((prev) => {
-            // 중복 방지: 이미 목록에 있는 ID라면 추가 안함
             if (prev.some(m => m.id === newMsg.id)) return prev;
             return [...prev, newMsg];
           });
@@ -94,33 +116,21 @@ const Chat = () => {
       }
     };
 
-    stompClient.onDisconnect = () => {
-      setConnected(false);
-    };
-
+    stompClient.onDisconnect = () => setConnected(false);
     stompClient.activate();
     setClient(stompClient);
 
-    // 컴포넌트 언마운트 시 또는 roomId 변경 시 연결 해제
     return () => {
-      if (stompClient) {
-        stompClient.deactivate();
-      }
+      if (stompClient) stompClient.deactivate();
     };
-  }, [myName, roomId]); // roomId가 바뀔 때마다 이 전체 로직이 새로 실행됨
+  }, [myName, roomId, apiUrl]);
 
   const sendMessage = () => {
     if (!client || !connected || input.trim() === '') return;
-
     client.publish({
       destination: '/pub/chat',
-      body: JSON.stringify({ 
-          roomId: roomId,      
-          message: input,
-          senderId: myName
-      }),
+      body: JSON.stringify({ roomId, message: input, senderId: myName }),
     });
-
     setInput(''); 
   };
 
@@ -128,6 +138,54 @@ const Chat = () => {
     if(!isoString) return '';
     const date = new Date(isoString);
     return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  // 메시지 내용 렌더링 (파일/텍스트 구분)
+  const renderMessageContent = (text) => {
+    if (text && text.startsWith("[FILE]:")) {
+      const content = text.replace("[FILE]:", "");
+      const [fileName, filePath] = content.split("|");
+      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+      const underscoreIndex = fileName.indexOf('_');
+      const displayFileName = underscoreIndex !== -1 
+      ? fileName.substring(underscoreIndex + 1) 
+      : fileName;
+      const fullUrl = `${apiUrl}${filePath}`;
+
+      if (isImage) {
+        return (
+          <div style={{ marginTop: '5px' }}>
+            <img 
+              src={fullUrl} 
+              alt="첨부 이미지" 
+              style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} 
+              onClick={() => window.open(fullUrl, '_blank')}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <a 
+          href={fullUrl} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px', 
+            textDecoration: 'none', 
+            color: 'inherit',
+            padding: '4px 0'
+          }}
+        >
+          <FileText size={20} />
+          <span style={{ fontSize: '13px', fontWeight: '500' }}>{displayFileName}</span>
+          <Download size={16} style={{ marginLeft: '5px', opacity: 0.7 }} />
+        </a>
+      );
+    }
+    return text;
   };
 
   if (!roomId) {
@@ -141,6 +199,7 @@ const Chat = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+      {/* 헤더 섹션 */}
       <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ color: '#333', marginBottom: '5px' }}>
@@ -154,6 +213,7 @@ const Chat = () => {
         </div>
       </div>
 
+      {/* 채팅창 섹션 */}
       <div
         ref={scrollRef}
         style={{
@@ -203,7 +263,7 @@ const Chat = () => {
                   lineHeight: '1.4'
                 }}
               >
-                {msg.text}
+                {renderMessageContent(msg.text)}
               </div>
               <span style={{ fontSize: '10px', color: '#aaa', minWidth: 'fit-content' }}>
                 {formatTime(msg.time)}
@@ -213,7 +273,26 @@ const Chat = () => {
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
+      {/* 입력 섹션 */}
+      <div style={{ display: 'flex', gap: '8px', marginTop: '15px', alignItems: 'center' }}>
+        {/* 숨겨진 파일 인풋 */}
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleFileUpload} 
+        />
+        
+        {/* 파일 첨부 버튼 */}
+        <CButton 
+          color="light" 
+          onClick={() => fileInputRef.current.click()}
+          disabled={!connected}
+          style={{ borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+        >
+          <Paperclip size={20} color="#666" />
+        </CButton>
+
         <CFormInput
           placeholder={connected ? "메시지를 입력하세요..." : "연결 대기 중..."}
           value={input}
@@ -222,6 +301,7 @@ const Chat = () => {
           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
           style={{ borderRadius: '20px', paddingLeft: '15px' }}
         />
+        
         <CButton 
           color="primary" 
           onClick={sendMessage} 

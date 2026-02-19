@@ -15,6 +15,8 @@ import {
   cilStar,
   cilCommentBubble,
   cilUser,
+  cilCalendar,
+  cilGamepad,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -499,6 +501,23 @@ const _nav = [
     ],
   },
   {
+    component: CNavGroup,
+    name: '게임',
+    icon: <CIcon icon={cilGamepad} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: '사다리게임',
+        to: '/ladderGame',
+      },
+      {
+        component: CNavItem,
+        name: '지뢰찾기',
+        to: '/minesweeper',
+      },
+    ],
+  },
+  {
     component: CNavItem,
     name: '채팅',
     to: '/chatroom',
@@ -512,10 +531,16 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Docs',
-    href: 'https://coreui.io/react/docs/templates/installation/',
-    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    name: '일정',
+    to: '/shedulePage',
+    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
+  // {
+  //   component: CNavItem,
+  //   name: 'Docs',
+  //   href: 'https://coreui.io/react/docs/templates/installation/',
+  //   icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+  // },
 ]
 
 export default _nav

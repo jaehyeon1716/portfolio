@@ -1,4 +1,4 @@
-import React, { useDebugValue, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   CButton,
@@ -37,21 +37,22 @@ const Login = () => {
         body: JSON.stringify({ username, password }),
       });
 
-      // 1. 성공했는지 먼저 확인
       if (response.ok) {
-        // [성공 로직]
         const data = await response.json();
-        localStorage.setItem('token', data.token);   // 토큰 저장
-        localStorage.setItem('username', username);  // 사용자 이름 저장
-        navigate('/');                               // 홈으로 이동
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('username', username);
+          navigate('/');
+        } else {
+          alert(`로그인 정보가 올바르지 않습니다.`);
+          setLoading(false);
+        }
       } else {
-        // [실패 로직] 401, 404, 500 에러 등
         const errorData = await response.json();
-        throw new Error(errorData.message || '로그인에 실패했습니다.');
+        throw new Error(errorData.message || '아이디 또는 비밀번호를 확인해주세요.');
       }
 
     } catch (err) {
-      // 위에서 throw한 에러나 네트워크 에러가 여기서 잡힙니다.
       setError(err.message);
       setLoading(false);
     }
@@ -66,43 +67,46 @@ const Login = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <CForm onSubmit={handleLogin}>
-                    <h1>Login</h1>
-                    <p className="text-body-secondary">Sign In to your account</p>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    <h1>로그인</h1>
+                    <p className="text-body-secondary">계정에 접속하세요</p>
+                    {error && <p style={{ color: 'red', fontSize: '0.9rem' }}>{error}</p>}
+                    
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        placeholder="Username"
+                        placeholder="아이디"
                         autoComplete="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
                       />
                     </CInputGroup>
+                    
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
                         type="password"
-                        placeholder="Password"
+                        placeholder="비밀번호"
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                       />
                     </CInputGroup>
+                    
                     <CRow>
                       <CCol xs={6}>
                         <CButton color="primary" className="px-4" type="submit" disabled={loading}>
-                          {loading ? 'Logging in...' : 'Login'}
+                          {loading ? '로그인 중...' : '로그인'}
                         </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
+                      <CCol xs={6} className="text-end">
                         <CButton color="link" className="px-0">
-                          Forgot password?
+                          비밀번호를 잊으셨나요?
                         </CButton>
                       </CCol>
                     </CRow>
@@ -113,14 +117,15 @@ const Login = () => {
               <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
-                    <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
+                    <h2>회원가입</h2>
+                    <p className="mt-3">
+                      아직 계정이 없으신가요? <br />
+                      지금 바로 가입하여 다양한 게임과 <br />
+                      커뮤니티 기능을 이용해보세요!
                     </p>
                     <Link to="/register">
                       <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
+                        지금 가입하기
                       </CButton>
                     </Link>
                   </div>

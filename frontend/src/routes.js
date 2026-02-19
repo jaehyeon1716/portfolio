@@ -57,6 +57,12 @@ const ChatRoom = React.lazy(() => import('./views/chat/Chatroom'))
 
 const userList = React.lazy(() => import('./views/user/userList'))
 
+const schedulePage = React.lazy(() => import('./views/schedule/SchedulePage'))
+
+// Game
+const ladderGame = React.lazy(() => import('./views/game/LadderGame'))
+const minesweeper = React.lazy(() => import('./views/game/Minesweeper'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -106,6 +112,9 @@ const routes = [
   { path: '/chat', name: 'chat', element: chat },
   { path: '/chatroom', name: 'ChatRoom', element: ChatRoom },
   { path: '/userList', name: 'userList', element: userList },
+  { path: '/shedulePage', name: 'schedulePage', element: schedulePage },
+  { path: '/ladderGame', name: 'ladderGame', element: ladderGame },
+  { path: '/minesweeper', name: 'minesweeper', element: minesweeper },
 ]
 
 export default routes

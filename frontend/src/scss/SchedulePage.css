@@ -1,0 +1,370 @@
+/* 1. 기본 컨테이너 레이아웃 */
+.schedule-container {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 40px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  color: #334155;
+  box-sizing: border-box;
+}
+
+/* 2. 헤더 섹션 */
+.schedule-header {
+  margin-bottom: 40px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 20px;
+}
+
+.title-area h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  color: #1e293b;
+  margin: 0;
+}
+
+.title-icon {
+  color: #4f46e5;
+}
+
+.current-date {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+/* 3. 메인 그리드 설정 (달력 vs 투두리스트) */
+.schedule-content {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+
+/* 4. 왼쪽: 달력(react-calendar) 커스텀 */
+.calendar-section .react-calendar {
+  width: 100% !important;
+  border: none;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  padding: 20px;
+  background: white;
+}
+
+/* 달력 날짜 칸(Tile) 설정 */
+.react-calendar__tile {
+  height: 120px !important; /* 높이 확보 */
+  padding: 5px 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: 0.5px solid #f8fafc;
+}
+
+/* 가로 막대들이 쌓이는 컨테이너 */
+.event-bar-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+/* 실제 가로 막대 스타일 */
+.event-bar {
+  width: 100%;
+  height: 20px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  color: #1e293b;
+  z-index: 1;
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+
+.event-bar.start {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  margin-left: 5px;
+  width: calc(100% - 5px);
+}
+
+.event-bar.end {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  margin-right: 5px;
+  width: calc(100% - 5px);
+}
+
+.event-bar.done {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.event-bar-text {
+  padding-left: 8px;
+  white-space: nowrap;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+/* 5. 오른쪽: 일정 입력 카드 */
+.input-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
+}
+
+.input-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #475569;
+}
+
+/* 시작일/종료일 그룹 */
+.period-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.date-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.date-input-wrapper label {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.date-input-wrapper input {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+/* 시간/텍스트 입력 그룹 */
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.time-input {
+  width: 100px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.text-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.text-input:focus {
+  border-color: #4f46e5;
+}
+
+.add-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  width: 54px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 6. 일정 리스트 스타일 */
+.todo-list {
+  background: #f8fafc;
+  padding: 25px;
+  border-radius: 24px;
+  min-height: 450px;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.todo-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.check-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+}
+
+.todo-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+}
+
+.todo-text {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+
+/* 삭제 버튼 */
+.del-btn {
+  color: #94a3b8;
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.del-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+/* 완료된 상태 */
+.todo-item.completed {
+  background: #fdfdfd;
+  opacity: 0.6;
+}
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+}
+
+.period-tag {
+  font-size: 10px;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 5px;
+}
+
+/* 헤더 레이아웃 조정 */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 타이틀과 버튼 사이 간격 */
+}
+
+/* Today 버튼 스타일 */
+.today-btn {
+  background-color: white;
+  color: #4f46e5;
+  border: 1.5px solid #4f46e5;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+}
+
+.today-btn:hover {
+  background-color: #4f46e5;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.2);
+}
+
+.today-btn:active {
+  transform: translateY(0);
+}
+
+/* 기존 타이틀 영역 모바일 대응 및 정렬 */
+.title-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* 날짜 요일과 수평 맞춤 */
+}
+
+/* 컬러 피커 스타일 */
+.color-picker-wrapper {
+  width: 45px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.color-input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 32px;
+  height: 32px;
+  border: none;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+
+/* 컬러 인풋 내부 동그라미 (크롬 기준) */
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color-input::-webkit-color-swatch {
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+}
+
+/* 일정 리스트 내 작은 색상 점 */
+.color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
