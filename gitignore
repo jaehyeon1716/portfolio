@@ -44,3 +44,6 @@ mysql_data/
 Thumbs.db
 
 postgres_data/
+
+### Secret Files ###
+src/main/resources/application-secret.yml
