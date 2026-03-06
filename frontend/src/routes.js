@@ -63,6 +63,9 @@ const schedulePage = React.lazy(() => import('./views/schedule/SchedulePage'))
 const ladderGame = React.lazy(() => import('./views/game/LadderGame'))
 const minesweeper = React.lazy(() => import('./views/game/Minesweeper'))
 
+const boardList = React.lazy(() => import('./views/board/BoardList'))
+const boardWrite = React.lazy(() => import('./views/board/BoardWrite'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -115,6 +118,8 @@ const routes = [
   { path: '/shedulePage', name: 'schedulePage', element: schedulePage },
   { path: '/ladderGame', name: 'ladderGame', element: ladderGame },
   { path: '/minesweeper', name: 'minesweeper', element: minesweeper },
+  { path: '/boardList', name: 'boardList', element: boardList },
+  { path: '/boardWrite', name: 'boardWrite', element: boardWrite },
 ]
 
 export default routes

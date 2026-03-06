@@ -18,9 +18,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //.requestMatchers("/api/auth/**").permitAll() // 로그인/회원가입은 허용
                         .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated() // 나머지는 로그인 필요
-                )
-                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().permitAll() // 로컬 개발중일땐 시큐리티 해제
+                        //.anyRequest().authenticated() // 나머지는 로그인 필요
+                );
+                //.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

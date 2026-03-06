@@ -35,6 +35,10 @@ const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  // 🔹 추가: 로컬 스토리지에서 사용자 정보 가져오기
+  const username = localStorage.getItem('username')
+  const isLoggedIn = !!localStorage.getItem('token')
+
   useEffect(() => {
     const handleScroll = () => {
       headerRef.current &&
@@ -54,6 +58,7 @@ const AppHeader = () => {
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
+        
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink to="/dashboard" as={NavLink}>
@@ -67,7 +72,14 @@ const AppHeader = () => {
             <CNavLink href="#">Settings</CNavLink>
           </CNavItem>
         </CHeaderNav>
+        
         <CHeaderNav className="ms-auto">
+          {/* 🔹 로그인 상태일 때만 아이디 표시 (벨 아이콘 왼쪽) */}
+          {isLoggedIn && (
+            <CNavItem className="d-flex align-items-center me-3">
+              <span className="fw-semibold text-body-secondary">{username}님</span>
+            </CNavItem>
+          )}
           <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
@@ -84,6 +96,7 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
+        
         <CHeaderNav>
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
@@ -99,6 +112,7 @@ const AppHeader = () => {
               )}
             </CDropdownToggle>
             <CDropdownMenu>
+              {/* ... 테마 드롭다운 메뉴 아이템들 ... */}
               <CDropdownItem
                 active={colorMode === 'light'}
                 className="d-flex align-items-center"
@@ -131,6 +145,12 @@ const AppHeader = () => {
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
+          {/* 🔹 로그인한 경우 아이디를 여기 한 번 더 보여줘도 예쁩니다 */}
+          {isLoggedIn && (
+            <li className="nav-item d-flex align-items-center px-2">
+              <small className="text-body-tertiary fw-bold">{username}</small>
+            </li>
+          )}
           <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>
