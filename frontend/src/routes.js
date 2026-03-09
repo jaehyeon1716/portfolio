@@ -65,6 +65,8 @@ const minesweeper = React.lazy(() => import('./views/game/Minesweeper'))
 
 const boardList = React.lazy(() => import('./views/board/BoardList'))
 const boardWrite = React.lazy(() => import('./views/board/BoardWrite'))
+const boardDetail = React.lazy(() => import('./views/board/BoardDetail'))
+const boardUpdate = React.lazy(() => import('./views/board/BoardWrite'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -120,6 +122,8 @@ const routes = [
   { path: '/minesweeper', name: 'minesweeper', element: minesweeper },
   { path: '/boardList', name: 'boardList', element: boardList },
   { path: '/boardWrite', name: 'boardWrite', element: boardWrite },
+  { path: '/board/detail/:id', name: 'boardDetail', element: boardDetail },
+  { path: '/boardUpdate/:id', name: 'boardUpdate', element: boardUpdate },
 ]
 
 export default routes

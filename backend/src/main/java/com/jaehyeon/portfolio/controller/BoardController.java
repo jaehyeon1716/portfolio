@@ -27,18 +27,29 @@ public class BoardController {
         return ResponseEntity.ok(id);
     }
 
-    /*@GetMapping("/list/{category}")
-    public ResponseEntity<List<BoardResponseDto>> getList(@PathVariable String category) {
-        return ResponseEntity.ok(boardService.getPostsByCategory(category));
-    }*/
-
-    // BoardController.java
     @GetMapping("/list/{category}")
     public ResponseEntity<Page<BoardResponseDto>> getList(
             @PathVariable String category,
             @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return ResponseEntity.ok(boardService.getPostsByCategory(category, pageable));
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<BoardResponseDto> getBoardDetail(@PathVariable Long id){
+        return ResponseEntity.ok(boardService.getBoardDetail(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDel(@PathVariable Long id){
+        boardService.deleteBoard(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto dto){
+        boardService.updateBoard(id, dto);
+        return ResponseEntity.ok().build();
     }
 
 }

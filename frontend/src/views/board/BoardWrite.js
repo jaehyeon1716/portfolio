@@ -1,70 +1,81 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CRow,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CFormTextarea,
-  CFormSelect,
-  CButton,
-  CFormCheck, // 🔹 체크박스 컴포넌트 추가
+  CCard, CCardBody, CCardHeader, CCol, CRow, CForm, CFormLabel,
+  CFormInput, CFormTextarea, CFormSelect, CButton, CFormCheck,
 } from '@coreui/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const BoardWrite = () => {
   const navigate = useNavigate()
-  
+  const { id } = useParams()
+  const apiUrl = `${import.meta.env.VITE_API_URL}`
+
   const [formData, setFormData] = useState({
     category: 'FREE',
     title: '',
     content: '',
-    is_important: false, // 🔹 중요 게시글 여부 초기값
+    is_important: false,
   })
-  const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    if (id) {
+      const fetchPost = async () => {
+        try {
+          const response = await axios.get(`${apiUrl}/api/board/detail/${id}`)
+          setFormData({
+            category: response.data.category,
+            title: response.data.title,
+            content: response.data.content,
+            is_important: response.data.isImportant, 
+          })
+        } catch (error) {
+          console.error('데이터 불러오기 실패:', error)
+          alert('게시글을 불러오는 데 실패했습니다.')
+        }
+      }
+      fetchPost()
+    }
+  }, [id, apiUrl])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    // 🔹 체크박스인 경우 value 대신 checked 값을 사용하도록 처리
     setFormData({ 
       ...formData, 
       [name]: type === 'checkbox' ? checked : value 
     })
   }
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0])
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const writer = localStorage.getItem('username')
 
-    const writer = localStorage.getItem('username');
-
-    if (!writer) {
-      alert('로그인 정보가 없습니다. 다시 로그인해 주세요.');
-      return;
-    }
-    
     try {
-      const postData = {
-        ...formData,
-        writer: writer
-      };
+      // 🔹 서버의 BoardRequestDto 구조와 일치하도록 명시적으로 데이터 생성
+      const categoryValue = typeof formData.category === 'object' 
+        ? formData.category.code 
+        : formData.category;
 
-      const response = await axios.post('/api/board/save', postData);
-
-      if (response.status === 200) {
-        alert('게시글이 성공적으로 등록되었습니다.');
-        navigate('/boardList'); 
+      const postData = { 
+        title: formData.title,
+        content: formData.content,
+        writer: writer,
+        category: categoryValue,
+        is_important: formData.is_important
+      }
+      console.log("전송 데이터 확인:", JSON.stringify(postData));
+      if (id) {
+        axios.put(`${apiUrl}/api/board/${id}`, postData)
+        alert('게시글이 수정되었습니다.')
+        navigate(`/board/detail/${id}`)
+      } else {
+        axios.post(`${apiUrl}/api/board/save`, postData)
+        alert('게시글이 등록되었습니다.')
+        navigate(`/boardList`)
       }
     } catch (error) {
-      console.error('전송 에러:', error);
-      alert('서버 전송 중 오류가 발생했습니다.');
+      console.error('전송 에러:', error)
+      alert('처리 중 오류가 발생했습니다.')
     }
   }
 
@@ -73,91 +84,49 @@ const BoardWrite = () => {
       <CCol xs={12}>
         <CCard className="mb-4 shadow-sm">
           <CCardHeader>
-            <strong>새 게시글 작성</strong>
+            <strong>{id ? '게시글 수정' : '새 게시글 작성'}</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* 카테고리 선택 */}
               <div className="mb-3">
                 <CFormLabel htmlFor="category">게시판 선택</CFormLabel>
-                <CFormSelect 
-                  id="category" 
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                >
+                <CFormSelect id="category" name="category" value={formData.category} onChange={handleChange}>
                   <option value="NOTICE">공지사항</option>
                   <option value="FREE">자유게시판</option>
                   <option value="ARCHIVE">업무 자료실</option>
                 </CFormSelect>
               </div>
 
-              {/* 🔹 공지사항 선택 시에만 출력되는 중요 체크박스 */}
               {formData.category === 'NOTICE' && (
                 <div className="mb-3">
                   <CFormCheck
                     id="is_important"
                     name="is_important"
-                    label="중요 공지사항으로 등록 (목록 상단 노출)"
+                    label="중요 공지사항으로 등록"
                     checked={formData.is_important}
                     onChange={handleChange}
                   />
                 </div>
               )}
 
-              {/* 작성자 표시 */}
               <div className="mb-3">
-                <CFormLabel htmlFor="writer">작성자</CFormLabel>
-                <CFormInput
-                  type="text"
-                  id="writer"
-                  value={localStorage.getItem('username') || '로그인 필요'}
-                  readOnly
-                  plainText
-                />
+                <CFormLabel>작성자</CFormLabel>
+                <CFormInput value={localStorage.getItem('username') || '로그인 필요'} readOnly plainText />
               </div>
 
-              {/* 제목 입력 */}
               <div className="mb-3">
                 <CFormLabel htmlFor="title">제목</CFormLabel>
-                <CFormInput
-                  type="text"
-                  id="title"
-                  name="title"
-                  placeholder="제목을 입력하세요"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                />
+                <CFormInput type="text" id="title" name="title" value={formData.title} onChange={handleChange} required />
               </div>
 
-              {/* 내용 입력 */}
               <div className="mb-3">
                 <CFormLabel htmlFor="content">내용</CFormLabel>
-                <CFormTextarea
-                  id="content"
-                  name="content"
-                  rows={10}
-                  placeholder="내용을 입력하세요"
-                  value={formData.content}
-                  onChange={handleChange}
-                  required
-                ></CFormTextarea>
-              </div>
-
-              {/* 파일 첨부 */}
-              <div className="mb-4">
-                <CFormLabel htmlFor="formFile">파일 첨부 (선택사항)</CFormLabel>
-                <CFormInput type="file" id="formFile" onChange={handleFileChange} />
+                <CFormTextarea id="content" name="content" rows={10} value={formData.content} onChange={handleChange} required />
               </div>
 
               <div className="d-flex justify-content-end gap-2">
-                <CButton color="secondary" variant="outline" onClick={() => navigate(-1)}>
-                  취소
-                </CButton>
-                <CButton type="submit" color="primary">
-                  등록하기
-                </CButton>
+                <CButton color="secondary" variant="outline" onClick={() => navigate(-1)}>취소</CButton>
+                <CButton type="submit" color="primary">{id ? '수정하기' : '등록하기'}</CButton>
               </div>
             </CForm>
           </CCardBody>

@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
     /*List<Board> findByCategoryOrderByRegDateDesc(CommonCode category);*/
-    Page<Board> findByCategory(CommonCode category, Pageable pageable);
+    Page<Board> findByCategoryAndDelYnOrderByIsImportantDescRegDateDesc(CommonCode category, boolean delYn, Pageable pageable);
 }

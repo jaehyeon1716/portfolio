@@ -6,38 +6,23 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "board")
+@Table(name = "comment")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Board {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String content;
+    private Long boardId;
     private String writer;
+    private String content;
     @Column(name = "del_yn", nullable = false)
     private boolean delYn;
 
     @Builder.Default
-    @Column(nullable = false)
-    private Long hit = 0L;
-
-    @Column(name = "is_important", nullable = false)
-    private boolean isImportant;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private CommonCode category;
-
     private LocalDateTime regDate = LocalDateTime.now();
-
-    public void increaseHit(){
-        this.hit = (this.hit == null ? 0 : this.hit) + 1;
-    }
-
 }

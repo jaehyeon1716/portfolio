@@ -11,6 +11,7 @@ import java.security.PrivateKey;
 @Setter
 @NoArgsConstructor
 public class BoardRequestDto {
+    private Long id;
     private String title;
     private String content;
     private String writer;
@@ -19,5 +20,8 @@ public class BoardRequestDto {
 
     @JsonProperty("is_important")
     private boolean isImportant;
+
+    @JsonProperty("del_yn")
+    private boolean delYn;
 
 }
