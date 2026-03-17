@@ -24,4 +24,7 @@ public class BoardRequestDto {
     @JsonProperty("del_yn")
     private boolean delYn;
 
+    private String searchType;
+    private String keyword;
+
 }

@@ -1,12 +1,15 @@
 package com.jaehyeon.portfolio.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter // 데이터를 서버에서 받을 때는 Setter가 필요합니다.
+@Setter
+@NoArgsConstructor
 public class CommentRequestDTO {
     private Long boardId;
     private String writer;
     private String content;
+    private Long parentId; // 이 필드를 추가하면 빨간 줄이 사라집니다!
 }

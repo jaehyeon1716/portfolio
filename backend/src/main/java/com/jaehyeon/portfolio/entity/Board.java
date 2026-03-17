@@ -2,8 +2,12 @@ package com.jaehyeon.portfolio.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "board")
@@ -12,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Board {
 
     @Id
@@ -34,10 +39,14 @@ public class Board {
     @JoinColumn(name = "category_id")
     private CommonCode category;
 
+    @CreatedDate
     private LocalDateTime regDate = LocalDateTime.now();
 
     public void increaseHit(){
         this.hit = (this.hit == null ? 0 : this.hit) + 1;
     }
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<BoardFile> fileList = new ArrayList<>();
 }
